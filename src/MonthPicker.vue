@@ -31,7 +31,7 @@
         :key="month"
         :class="{
           'clearable': clearable,
-          'selected': currentMonth === month,
+          'selected': currentMonth === month && year === currentYear,
           'disabled': !isAvailableMonth(i)
         }"
         class="month-picker__month"
@@ -51,6 +51,7 @@ export default {
   name: 'en',
   mixins: [monthPicker],
   data: () => ({
+    currentYear: null,
     currentMonthIndex: null,
     year: new Date().getFullYear()
   }),
@@ -77,7 +78,7 @@ export default {
         to: new Date(year, month, 1),
         month: this.monthsByLang[month - 1],
         monthIndex: month,
-        year: year
+        year: this.currentYear
       }
     }
   },
@@ -106,7 +107,7 @@ export default {
         return true
       }
       return this.availableMonths.some((date) => {
-        return (date.getMonth() + 1 === index) && (date.getFullYear() === this.year)
+        return (date.getMonth() === index) && (date.getFullYear() === this.year)
       })
     },
     onChange() {
@@ -132,6 +133,7 @@ export default {
       }
 
       this.currentMonthIndex = index
+      this.currentYear = this.year
       this.onChange()
       if (input) {
         this.$emit('input', this.date)
@@ -139,7 +141,7 @@ export default {
     },
     changeYear(value) {
       this.year += value
-      this.onChange()
+      // this.onChange()
       this.$emit('change-year', this.year)
     }
   }
