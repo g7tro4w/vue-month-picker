@@ -67,10 +67,11 @@
 				:editable-year="isEditableYear"
 				:variant="selectedVariant"
 				:show-year="showYear"
+				:available-months="getAvailableMonths"
 			>
 			</month-picker>
 			<br><br>
-			
+
 			<h3>Input</h3>
 			<month-picker-input
 				:no-default="true"
@@ -101,12 +102,24 @@ export default {
 				to: null,
 				month: null,
 				year: null
-			}
+			},
+			availableMonths: [
+				"2018-08",
+				"2019-01",
+				"2019-02",
+				"2019-03",
+				"2019-12"
+			]
 		}
 	},
 	components: {
 		MonthPicker,
 		MonthPickerInput
+	},
+	computed: {
+		getAvailableMonths () {
+			return this.availableMonths.map(month => new Date(month))
+		}
 	},
 	methods: {
 		showClearText () {
@@ -154,23 +167,23 @@ export default {
 		0% {
 			transform: rotate(0deg);
 		}
-		
+
 		20% {
 			transform: rotate(-25deg);
 		}
-		
+
 		40% {
 			transform: rotate(10deg);
 		}
-		
+
 		60% {
 		transform: rotate(-25deg);
 		}
-		
+
 		80% {
 			transform: rotate(10deg);
 		}
-		
+
 		100% {
 			transform: rotate(0deg);
 		}

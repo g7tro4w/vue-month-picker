@@ -31,7 +31,8 @@
         :key="month"
         :class="{
           'clearable': clearable,
-          'selected': currentMonth === month
+          'selected': currentMonth === month,
+          'disabled': !isAvailableMonth(i)
         }"
         class="month-picker__month"
         @click="selectMonth(i, true)"
@@ -55,7 +56,7 @@ export default {
   }),
   computed: {
     monthsByLang: function() {
-      if (this.months !== null && 
+      if (this.months !== null &&
           this.months.length === 12) {
         return this.months
       }
@@ -100,6 +101,14 @@ export default {
     }
   },
   methods: {
+    isAvailableMonth(index) {
+      if (this.availableMonths.length === 0) {
+        return true
+      }
+      return this.availableMonths.some((date) => {
+        return (date.getMonth() + 1 === index) && (date.getFullYear() === this.year)
+      })
+    },
     onChange() {
       if (!Number.parseInt(this.year)) {
         this.year = this.defaultYear || new Date().getFullYear()
@@ -108,6 +117,9 @@ export default {
       this.$emit('change', this.date)
     },
     selectMonth(index, input = false) {
+      if (!this.isAvailableMonth(index)) {
+        return
+      }
       const isAlreadySelected = this.currentMonthIndex === index
       if (this.clearable && isAlreadySelected) {
         this.currentMonthIndex = null
@@ -288,6 +300,13 @@ export default {
   z-index: 10;
 }
 
+.disabled {
+  color: #AAA;
+}
+.disabled:hover {
+  cursor: default;
+  box-shadow: none;
+}
 @media only screen and (max-width: 768px) {
   .month-picker__container {
     width: 100%;

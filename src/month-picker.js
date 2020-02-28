@@ -55,6 +55,10 @@ export default {
       validator: function (value) {
         return ['default', 'dark'].includes(value)
       }
+    },
+    availableMonths: {
+      type: Array,
+      default: () => ([])
     }
   }
 }
