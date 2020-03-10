@@ -68,6 +68,8 @@
 				:variant="selectedVariant"
 				:show-year="showYear"
 				:available-months="getAvailableMonths"
+				:min-year="2018"
+				:max-year="2020"
 			>
 			</month-picker>
 			<br><br>

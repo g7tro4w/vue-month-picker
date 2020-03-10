@@ -59,6 +59,16 @@ export default {
     availableMonths: {
       type: Array,
       default: () => ([])
+    },
+    maxYear: {
+      type: Number,
+    },
+    minYear: {
+      type: Number,
+    },
+    disableUnavailableMonths: {
+      type: Boolean,
+      default: false
     }
   }
 }

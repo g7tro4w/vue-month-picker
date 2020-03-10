@@ -7,7 +7,7 @@
       v-if="showYear"
       class="month-picker__year"
     >
-      <button @click="changeYear(-1)">
+      <button @click="changeYear(-1)" v-if="!(minYear && minYear === year)">
         &lsaquo;
       </button>
       <p
@@ -21,7 +21,7 @@
         v-model.number="year"
         @change="onChange()"
       >
-      <button @click="changeYear(+1)">
+      <button @click="changeYear(+1)" v-if="!(maxYear && maxYear === year)">
         &rsaquo;
       </button>
     </div>
@@ -32,7 +32,8 @@
         :class="{
           'clearable': clearable,
           'selected': currentMonth === month && year === currentYear,
-          'disabled': !isAvailableMonth(i)
+          'disabled': !isAvailableMonth(i) && disableUnavailableMonths,
+          'month_colored': isAvailableMonth(i)
         }"
         class="month-picker__month"
         @click="selectMonth(i, true)"
@@ -118,7 +119,7 @@ export default {
       this.$emit('change', this.date)
     },
     selectMonth(index, input = false) {
-      if (!this.isAvailableMonth(index)) {
+      if (!this.isAvailableMonth(index) && this.disableUnavailableMonths) {
         return
       }
       const isAlreadySelected = this.currentMonthIndex === index
@@ -244,7 +245,7 @@ export default {
 }
 
 .month-picker__month.selected {
-  background-color: #55B0F2;
+  background-color: #0062FF;
   color: #FFFFFF;
   border-radius: 5px;
   box-shadow: inset 0 0 3px #3490d2, 0px 2px 5px rgba(85, 176, 242, 0.2);
@@ -308,6 +309,9 @@ export default {
 .disabled:hover {
   cursor: default;
   box-shadow: none;
+}
+.month_colored {
+  color: #0062FF;
 }
 @media only screen and (max-width: 768px) {
   .month-picker__container {
