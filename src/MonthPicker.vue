@@ -71,12 +71,11 @@ export default {
     },
     date: function() {
       const month = this.monthsByLang.indexOf(this.currentMonth) + 1
-      const date = new Date(`${this.year}/${month}/01`)
-      const year = date.getFullYear()
+      const date = new Date(this.year, month - 1, 1)
 
       return {
         from: date,
-        to: new Date(year, month, 1),
+        to: new Date(this.year, month, 0),
         month: this.monthsByLang[month - 1],
         monthIndex: month,
         year: this.currentYear
