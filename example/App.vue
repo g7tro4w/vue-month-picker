@@ -67,10 +67,11 @@
 				:editable-year="isEditableYear"
 				:variant="selectedVariant"
 				:show-year="showYear"
-				:available-months="getAvailableMonths"
 				:min-year="2018"
 				:max-year="2020"
 			>
+
+				<!--				:available-months="getAvailableMonths"-->
 			</month-picker>
 			<br><br>
 

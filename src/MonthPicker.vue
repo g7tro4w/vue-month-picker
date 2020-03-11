@@ -33,7 +33,7 @@
           'clearable': clearable,
           'selected': currentMonth === month && year === currentYear,
           'disabled': !isAvailableMonth(i) && disableUnavailableMonths,
-          'month_colored': isAvailableMonth(i)
+          'month_colored': availableMonths && availableMonths.length > 0 && isAvailableMonth(i)
         }"
         class="month-picker__month"
         @click="selectMonth(i, true)"
