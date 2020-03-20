@@ -58,11 +58,15 @@
 			<strong>@clear <em>{{ clearEmittedText }}</em></strong>
 
 			<br><br>
+			<button @click="isShow = !isShow">{{isShow ? 'Hide' : 'Show'}}</button>
 			<month-picker
+				v-if="isShow"
 				@change="showDate"
 				@change-year="(v) => year = v"
 				@clear="showClearText"
 				lang="en"
+				:default="defaultValue"
+				:available-months="availableMonths"
 				:clearable="isClearable"
 				:editable-year="isEditableYear"
 				:variant="selectedVariant"
@@ -91,6 +95,11 @@ import MonthPickerInput from '@/MonthPickerInput.vue'
 export default {
 	data() {
 		return {
+			defaultValue: {
+				from: new Date(2019, 6, 1),
+				to: new Date(2020, 4, 0)
+			},
+			isShow: false,
 			year: 0,
 			clearEmittedText: null,
 			isMonthPickerVisible: false,

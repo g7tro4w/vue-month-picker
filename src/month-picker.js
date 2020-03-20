@@ -18,15 +18,15 @@ export default {
       },
       required: false
     },
-    defaultMonth: {
-      type: Number,
-      default: null,
-      required: false
-    },
-    defaultYear: {
-      type: Number,
-      default: null,
-      required: false
+    default: {
+      type: Object,
+      default: () => {
+        const currentDate = new Date()
+        return {
+          from: new Date(),
+          to: new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+        }
+      }
     },
     showYear: {
       type: Boolean,

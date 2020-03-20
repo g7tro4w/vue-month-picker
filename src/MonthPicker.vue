@@ -31,12 +31,13 @@
         :key="month"
         :class="{
           'clearable': clearable,
-          'selected': currentMonth === month && year === currentYear,
+          'selected': (endMonth.index >= i && endMonth.year >= year || endMonth.year > year) && (startMonth.index <= i && startMonth.year <= year || startMonth.year < year) || (startMonth.index === i && startMonth.year === year),// currentMonth === month && year === currentYear,
           'disabled': !isAvailableMonth(i) && disableUnavailableMonths,
           'month_colored': availableMonths && availableMonths.length > 0 && isAvailableMonth(i)
         }"
         class="month-picker__month"
-        @click="selectMonth(i, true)"
+        @click="selectMonth(i, month, year)"
+        @mouseover="onMonthMouseOver(month, year, i)"
       >
         {{ month }}
       </div>
@@ -51,11 +52,22 @@ import monthPicker from './month-picker'
 export default {
   name: 'en',
   mixins: [monthPicker],
-  data: () => ({
+    data: () => ({
     currentYear: null,
     currentMonthIndex: null,
-    year: new Date().getFullYear()
-  }),
+    year: new Date().getFullYear(),
+    isEditState: false,
+    startMonth: {
+      month: null,
+      year: null,
+      index: null
+    },
+    endMonth: {
+      month: null,
+      year: null,
+      index: null
+    },
+    }),
   computed: {
     monthsByLang: function() {
       if (this.months !== null &&
@@ -83,22 +95,29 @@ export default {
     }
   },
   watch: {
-    defaultMonth (newVal) {
-      this.currentMonthIndex = newVal
-    },
-    defaultYear (newVal) {
-      this.year = newVal
+    default (newVal) {
+      const startDate = newVal.from
+      const endDate = newVal.to
+      this.startMonth.month = this.monthsByLang[startDate.getMonth()]
+      this.startMonth.year = startDate.getFullYear()
+      this.startMonth.index = startDate.getMonth()
+      this.endMonth.month = this.monthsByLang[endDate.getMonth()]
+      this.endMonth.year = endDate.getFullYear()
+      this.endMonth.index = endDate.getMonth()
+      this.year = this.startMonth.year
     }
   },
   mounted() {
-    if (this.defaultMonth) {
-      this.selectMonth(this.defaultMonth - 1)
-    } else if (!this.noDefault) {
-      this.selectMonth(0)
-    }
-
-    if (this.defaultYear) {
-      this.year = this.defaultYear
+    if (this.default) {
+      const startDate = this.default.from
+      const endDate = this.default.to
+      this.startMonth.month = this.monthsByLang[startDate.getMonth()]
+      this.startMonth.year = startDate.getFullYear()
+      this.startMonth.index = startDate.getMonth()
+      this.endMonth.month = this.monthsByLang[endDate.getMonth()]
+      this.endMonth.year = endDate.getFullYear()
+      this.endMonth.index = endDate.getMonth()
+      this.year = this.startMonth.year
     }
   },
   methods: {
@@ -107,41 +126,53 @@ export default {
         return true
       }
       return this.availableMonths.some((date) => {
-        return (date.getMonth() === index) && (date.getFullYear() === this.year)
+        const currentDate = new Date(date)
+        return (currentDate.getMonth() === index) && (currentDate.getFullYear() === this.year)
       })
     },
-    onChange() {
-      if (!Number.parseInt(this.year)) {
-        this.year = this.defaultYear || new Date().getFullYear()
+    onMonthMouseOver (month, year, index) {
+      if (this.isEditState) {
+        this.endMonth.month = month
+        this.endMonth.year = year
+        this.endMonth.index = index
       }
-
-      this.$emit('change', this.date)
     },
-    selectMonth(index, input = false) {
-      if (!this.isAvailableMonth(index) && this.disableUnavailableMonths) {
+    selectMonth(index, month, year) {
+      if (!this.isAvailableMonth(index) && this.disableUnavailableMonths || this.isEditState && (this.startMonth.index > index && this.startMonth.year === year || this.startMonth.year > year)) {
         return
       }
-      const isAlreadySelected = this.currentMonthIndex === index
-      if (this.clearable && isAlreadySelected) {
-        this.currentMonthIndex = null
-        this.$emit('clear')
-        return
+      if (this.isEditState) {
+        this.isEditState = false
+        this.endMonth.month = month
+        this.endMonth.year = year
+        this.endMonth.index = index
+        console.log({
+          from: new Date(this.startMonth.year, this.startMonth.index, 1),
+          to: new Date(year, index + 1, 0)
+        })
+        this.$emit('change', {
+          from: new Date(this.startMonth.year, this.startMonth.index, 1),
+          to: new Date(year, index + 1, 0)
+        })
+      } else {
+        this.isEditState = true
+        this.endMonth.month = null
+        this.endMonth.year = null
+        this.endMonth.index = null
+        this.startMonth.month = month
+        this.startMonth.index = index
+        this.startMonth.year = year
       }
 
-      if (this.isAlreadySelected) {
-        return
-      }
-
-      this.currentMonthIndex = index
-      this.currentYear = this.year
-      this.onChange()
-      if (input) {
-        this.$emit('input', this.date)
-      }
+      // this.currentMonthIndex = index
+      // this.currentYear = this.year
+      // this.onChange()
+      // if (input) {
+      //   this.$emit('input', this.date)
+      // }
     },
     changeYear(value) {
       this.year += value
-      // this.onChange()
       this.$emit('change-year', this.year)
     }
   }
@@ -150,7 +181,7 @@ export default {
 
 <style>
 .month-picker__container {
-  width: 400px;
+  width: 300px;
   position: relative;
   border: 1px solid #DDDDDD;
   border-radius: 5px;
@@ -173,7 +204,7 @@ export default {
   width: 100%;
   font-weight: 600;
   letter-spacing: 1px;
-  font-size: 1.2em;
+  font-size: 14px;
 }
 
 .month-picker__year input {
@@ -207,7 +238,7 @@ export default {
   background-color: #FFFFFF;
   position: absolute;
   width: 2em;
-  font-size: 1.5em;
+  font-size: 1.2em;
   border-radius: 5px;
   outline: none;
   border: 0;
@@ -235,8 +266,9 @@ export default {
 
 .month-picker__month {
   flex-basis: calc(33.333% - 10px);
-  padding: 0.75em 0.25em;
+  padding: 0.5em 0.25em;
   cursor: pointer;
+  font-size: 12px;
   text-align: center;
   border: 1px solid rgba(245, 245, 245, .75);
   transition: all 250ms cubic-bezier(0.165, 0.84, 0.44, 1);
