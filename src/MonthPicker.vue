@@ -146,10 +146,6 @@ export default {
         this.endMonth.month = month
         this.endMonth.year = year
         this.endMonth.index = index
-        console.log({
-          from: new Date(this.startMonth.year, this.startMonth.index, 1),
-          to: new Date(year, index + 1, 0)
-        })
         this.$emit('change', {
           from: new Date(this.startMonth.year, this.startMonth.index, 1),
           to: new Date(year, index + 1, 0)
